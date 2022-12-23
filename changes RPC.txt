@@ -1,0 +1,55 @@
+rpcinfo
+cd RPC
+rpcgen -1 -C add.x
+make -f Makefile.add
+sudo ./add_server
+sudo ./add_clien
+sudo ./add_client localhost 12 12
+
+//Program for add_server.c
+#include "add.h"
+int *add_1_svc(numbers *argp, struct svc_req *rqstp)
+{
+static int result;
+result=argp->a + argp->b;
+return &result;
+}
+//Program for add_client.c
+#include "add.h"
+Void add_prog_1(char *host, int x, int y)
+{
+CLIENT *clnt;
+int *result_1;
+numbers add_1_arg;
+#ifndef DEBUG
+clnt = clnt_create (host, ADD_PROG, ADD_VERS, "udp");
+if (clnt == NULL) {
+clnt_pcreateerror (host);
+exit (1);
+}
+#endif /* DEBUG */
+add_1_arg.a=x;
+add_2_arg.b=y;
+result_1 = add_1(&add_1_arg, clnt);
+if (result_1 == (int *) NULL) {
+clnt_perror (clnt, "call failed");
+}
+else{
+printf("Result is - %d",*result_1);
+}
+#ifndef DEBUG
+clnt_destroy (clnt);
+#endif /* DEBUG */
+}
+Int main (int argc, char *argv[])
+{
+char *host;
+if (argc < 4) {
+printf ("usage: %s server_host number1
+number2\n", argv[0]);
+exit (1);
+}
+host = argv[1];
+add_prog_1 (host, atoi(argv[2]),atoi(argv[3]));
+exit (0);
+}
